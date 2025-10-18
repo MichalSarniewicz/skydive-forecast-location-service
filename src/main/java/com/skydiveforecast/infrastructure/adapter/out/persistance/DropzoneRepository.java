@@ -1,4 +1,4 @@
-package com.skydiveforecast.infrastructure.out.persistance;
+package com.skydiveforecast.infrastructure.adapter.out.persistance;
 
 import com.skydiveforecast.domain.model.DropzoneEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

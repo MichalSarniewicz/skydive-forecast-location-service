@@ -1,8 +1,8 @@
 package com.skydiveforecast.domain.port.in;
 
-import com.skydiveforecast.domain.model.mapper.DropzoneMapper;
+import com.skydiveforecast.infrastructure.adapter.in.web.mapper.DropzoneMapper;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
-import com.skydiveforecast.infrastructure.out.persistance.DropzoneRepository;
+import com.skydiveforecast.infrastructure.adapter.out.persistance.DropzoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

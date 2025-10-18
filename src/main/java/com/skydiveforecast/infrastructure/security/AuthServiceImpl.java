@@ -1,6 +1,5 @@
 package com.skydiveforecast.infrastructure.security;
 
-import com.skydiveforecast.domain.service.AuthService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

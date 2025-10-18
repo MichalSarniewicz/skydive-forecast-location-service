@@ -1,4 +1,4 @@
-package com.skydiveforecast.domain.service;
+package com.skydiveforecast.infrastructure.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 

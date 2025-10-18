@@ -1,6 +1,5 @@
-package com.skydiveforecast.domain.service;
+package com.skydiveforecast.infrastructure.security;
 
-import com.skydiveforecast.infrastructure.security.CustomUserPrincipal;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

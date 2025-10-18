@@ -1,7 +1,7 @@
 package com.skydiveforecast.domain.port.in;
 
 import com.skydiveforecast.domain.exception.DropzoneNotFoundException;
-import com.skydiveforecast.infrastructure.out.persistance.DropzoneRepository;
+import com.skydiveforecast.infrastructure.adapter.out.persistance.DropzoneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
