@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class DropzoneResponse {
-
     private Long id;
     private String name;
     private String city;
