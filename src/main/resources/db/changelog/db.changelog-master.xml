@@ -6,5 +6,6 @@
         https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <include file="/db/changelog/2025-10-16-add-dropzones-table.sql"/>
+    <include file="/db/changelog/2025-10-24-insert-dropzones.sql"/>
 
 </databaseChangeLog>
