@@ -3,6 +3,7 @@ package com.skydiveforecast.infrastructure.adapter.in.web;
 import com.skydiveforecast.domain.port.in.*;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneRequest;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
+import com.skydiveforecast.infrastructure.security.PermissionSecurity;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class DropzoneController {
     private final FindDropzonesByCityUseCase findDropzonesByCityUseCase;
 
     @PostMapping
+    @PermissionSecurity(permission = "DROPZONE_CREATE")
     @Operation(summary = "Create dropzone", description = "Creates dropzones", tags = {"Dropzones"})
     public ResponseEntity<DropzoneResponse> createDropzone(@Valid @RequestBody DropzoneRequest request) {
         DropzoneResponse response = createDropzoneUseCase.execute(request);
@@ -32,6 +34,7 @@ public class DropzoneController {
     }
 
     @GetMapping("/{id}")
+    @PermissionSecurity(permission = "DROPZONE_VIEW")
     @Operation(summary = "Get dropzone", description = "Gets dropzone by id", tags = {"Dropzones"})
     public ResponseEntity<DropzoneResponse> getDropzone(@PathVariable Long id) {
         DropzoneResponse response = getDropzoneUseCase.execute(id);
@@ -39,6 +42,7 @@ public class DropzoneController {
     }
 
     @GetMapping
+    @PermissionSecurity(permission = "DROPZONE_VIEW")
     @Operation(summary = "Get all dropzones", description = "Gets all dropzones", tags = {"Dropzones"})
     public ResponseEntity<List<DropzoneResponse>> getAllDropzones() {
         List<DropzoneResponse> responses = getAllDropzonesUseCase.execute();
@@ -46,6 +50,7 @@ public class DropzoneController {
     }
 
     @PutMapping("/{id}")
+    @PermissionSecurity(permission = "DROPZONE_UPDATE")
     @Operation(summary = "Update dropzone", description = "Updates dropzone by id", tags = {"Dropzones"})
     public ResponseEntity<DropzoneResponse> updateDropzone(
             @PathVariable Long id,
@@ -55,6 +60,7 @@ public class DropzoneController {
     }
 
     @DeleteMapping("/{id}")
+    @PermissionSecurity(permission = "DROPZONE_DELETE")
     @Operation(summary = "Delete dropzone", description = "Deletes dropzone by id", tags = {"Dropzones"})
     public ResponseEntity<Void> deleteDropzone(@PathVariable Long id) {
         deleteDropzoneUseCase.execute(id);
@@ -62,6 +68,7 @@ public class DropzoneController {
     }
 
     @GetMapping("/city/{city}")
+    @PermissionSecurity(permission = "DROPZONE_VIEW")
     @Operation(summary = "Get dropzones by city", description = "Gets dropzones by city", tags = {"Dropzones"})
     public ResponseEntity<List<DropzoneResponse>> getDropzonesByCity(@PathVariable String city) {
         List<DropzoneResponse> responses = findDropzonesByCityUseCase.execute(city);
