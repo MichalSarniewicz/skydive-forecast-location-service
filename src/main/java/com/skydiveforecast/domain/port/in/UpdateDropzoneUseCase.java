@@ -7,6 +7,7 @@ import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneRequest;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
 import com.skydiveforecast.infrastructure.adapter.out.persistance.DropzoneRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ public class UpdateDropzoneUseCase {
     private final DropzoneMapper dropzoneMapper;
 
     @Transactional
+    @CacheEvict(value = "dropzones", allEntries = true)
     public DropzoneResponse execute(Long id, DropzoneRequest request) {
         DropzoneEntity dropzone = dropzoneRepository.findById(id)
                 .orElseThrow(() -> new DropzoneNotFoundException("Dropzone with id " + id + " not found"));
