@@ -49,6 +49,7 @@ The service follows **Hexagonal Architecture** (Ports and Adapters) pattern:
 - **Lombok**: Boilerplate code reduction
 - **JUnit 5 & Mockito**: Unit testing
 - **Testcontainers**: Integration testing
+- **Monitoring**: Actuator, Prometheus, Grafana, Loki, Zipkin
 - **Build Tool**: Maven
 
 ## Getting Started
@@ -204,6 +205,35 @@ The service provides comprehensive error handling with standardized error respon
 - `404 Not Found`: Resource not found
 - `409 Conflict`: Data integrity violations
 - `500 Internal Server Error`: Unexpected errors
+
+## Monitoring
+
+The service includes comprehensive monitoring capabilities:
+
+### Metrics (Prometheus)
+
+- **Endpoint**: `http://localhost:8083/actuator/prometheus`
+- **Metrics**: JVM, HTTP requests, database connections, Kafka consumers, Redis cache
+
+### Health Checks
+
+- **Endpoint**: `http://localhost:8083/actuator/health`
+
+### Logs (Loki)
+
+Application logs are automatically sent to Loki for centralized log aggregation.
+
+### Distributed Tracing (Zipkin)
+
+- **Endpoint**: `http://localhost:9411`
+- **Traces**: Request flows across services with timing information
+- **Sampling**: 100% of requests traced (configurable)
+
+### Grafana Dashboards
+
+Access Grafana at `http://localhost:3000` (admin/admin)
+
+Recommended dashboard: Import ID **11378** (JVM Micrometer)
 
 ## License
 
