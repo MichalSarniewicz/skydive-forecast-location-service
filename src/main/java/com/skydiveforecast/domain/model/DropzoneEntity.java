@@ -44,5 +44,6 @@ public class DropzoneEntity {
     private BigDecimal longitude;
 
     @Column(name = "is_wingsuit_friendly", nullable = false)
+    @Builder.Default
     private Boolean isWingsuitFriendly = false;
 }
