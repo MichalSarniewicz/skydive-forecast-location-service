@@ -1,9 +1,9 @@
-package com.skydiveforecast.domain.port.in;
+package com.skydiveforecast.application.service;
 
 import com.skydiveforecast.domain.model.DropzoneEntity;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
 import com.skydiveforecast.infrastructure.adapter.in.web.mapper.DropzoneMapper;
-import com.skydiveforecast.infrastructure.adapter.out.persistance.DropzoneRepository;
+import com.skydiveforecast.domain.port.out.DropzoneRepositoryPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,16 +18,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class GetAllDropzonesUseCaseTest {
+class GetAllDropzonesServiceTest {
 
     @Mock
-    private DropzoneRepository dropzoneRepository;
+    private DropzoneRepositoryPort dropzoneRepositoryPort;
 
     @Mock
     private DropzoneMapper dropzoneMapper;
 
     @InjectMocks
-    private GetAllDropzonesUseCase getAllDropzonesUseCase;
+    private GetAllDropzonesService getAllDropzonesUseCase;
 
     @Test
     void execute_ShouldReturnAllDropzones() {
@@ -68,7 +68,7 @@ class GetAllDropzonesUseCaseTest {
                 .isWingsuitFriendly(false)
                 .build();
 
-        when(dropzoneRepository.findAll()).thenReturn(List.of(entity1, entity2));
+        when(dropzoneRepositoryPort.findAll()).thenReturn(List.of(entity1, entity2));
         when(dropzoneMapper.toResponse(entity1)).thenReturn(response1);
         when(dropzoneMapper.toResponse(entity2)).thenReturn(response2);
 
@@ -78,19 +78,19 @@ class GetAllDropzonesUseCaseTest {
         // Assert
         assertThat(result).hasSize(2);
         assertThat(result).containsExactly(response1, response2);
-        verify(dropzoneRepository).findAll();
+        verify(dropzoneRepositoryPort).findAll();
     }
 
     @Test
     void execute_ShouldReturnEmptyListWhenNoDropzones() {
         // Arrange
-        when(dropzoneRepository.findAll()).thenReturn(List.of());
+        when(dropzoneRepositoryPort.findAll()).thenReturn(List.of());
 
         // Act
         List<DropzoneResponse> result = getAllDropzonesUseCase.execute();
 
         // Assert
         assertThat(result).isEmpty();
-        verify(dropzoneRepository).findAll();
+        verify(dropzoneRepositoryPort).findAll();
     }
 }

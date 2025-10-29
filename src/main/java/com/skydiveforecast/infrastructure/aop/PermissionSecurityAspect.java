@@ -1,7 +1,7 @@
 package com.skydiveforecast.infrastructure.aop;
 
+import com.skydiveforecast.domain.annotation.PermissionSecurity;
 import com.skydiveforecast.infrastructure.security.PermissionSecurityService;
-import com.skydiveforecast.infrastructure.security.PermissionSecurity;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -19,7 +19,7 @@ public class PermissionSecurityAspect {
 
     private final PermissionSecurityService permissionSecurityService;
 
-    @Around("@annotation(com.skydiveforecast.infrastructure.security.PermissionSecurity)")
+    @Around("@annotation(com.skydiveforecast.domain.annotation.PermissionSecurity)")
     public Object checkPermission(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();

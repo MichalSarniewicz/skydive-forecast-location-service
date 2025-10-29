@@ -1,10 +1,10 @@
-package com.skydiveforecast.domain.port.in;
+package com.skydiveforecast.application.service;
 
 import com.skydiveforecast.domain.exception.DropzoneNotFoundException;
 import com.skydiveforecast.domain.model.DropzoneEntity;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
 import com.skydiveforecast.infrastructure.adapter.in.web.mapper.DropzoneMapper;
-import com.skydiveforecast.infrastructure.adapter.out.persistance.DropzoneRepository;
+import com.skydiveforecast.domain.port.out.DropzoneRepositoryPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,16 +20,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class GetDropzoneUseCaseTest {
+class GetDropzoneServiceTest {
 
     @Mock
-    private DropzoneRepository dropzoneRepository;
+    private DropzoneRepositoryPort dropzoneRepositoryPort;
 
     @Mock
     private DropzoneMapper dropzoneMapper;
 
     @InjectMocks
-    private GetDropzoneUseCase getDropzoneUseCase;
+    private GetDropzoneService getDropzoneUseCase;
 
     @Test
     void execute_ShouldReturnDropzoneWhenExists() {
@@ -53,7 +53,7 @@ class GetDropzoneUseCaseTest {
                 .isWingsuitFriendly(true)
                 .build();
 
-        when(dropzoneRepository.findById(dropzoneId)).thenReturn(Optional.of(entity));
+        when(dropzoneRepositoryPort.findById(dropzoneId)).thenReturn(Optional.of(entity));
         when(dropzoneMapper.toResponse(entity)).thenReturn(expectedResponse);
 
         // Act
@@ -63,7 +63,7 @@ class GetDropzoneUseCaseTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(dropzoneId);
         assertThat(result.getName()).isEqualTo("Test Dropzone");
-        verify(dropzoneRepository).findById(dropzoneId);
+        verify(dropzoneRepositoryPort).findById(dropzoneId);
         verify(dropzoneMapper).toResponse(entity);
     }
 
@@ -71,12 +71,12 @@ class GetDropzoneUseCaseTest {
     void execute_ShouldThrowExceptionWhenDropzoneNotFound() {
         // Arrange
         Long dropzoneId = 999L;
-        when(dropzoneRepository.findById(dropzoneId)).thenReturn(Optional.empty());
+        when(dropzoneRepositoryPort.findById(dropzoneId)).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThatThrownBy(() -> getDropzoneUseCase.execute(dropzoneId))
                 .isInstanceOf(DropzoneNotFoundException.class)
                 .hasMessageContaining("Dropzone with id " + dropzoneId + " not found");
-        verify(dropzoneRepository).findById(dropzoneId);
+        verify(dropzoneRepositoryPort).findById(dropzoneId);
     }
 }

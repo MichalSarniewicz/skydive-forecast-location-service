@@ -1,9 +1,9 @@
-package com.skydiveforecast.domain.port.in;
+package com.skydiveforecast.application.service;
 
 import com.skydiveforecast.domain.model.DropzoneEntity;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
 import com.skydiveforecast.infrastructure.adapter.in.web.mapper.DropzoneMapper;
-import com.skydiveforecast.infrastructure.adapter.out.persistance.DropzoneRepository;
+import com.skydiveforecast.domain.port.out.DropzoneRepositoryPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,16 +18,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class FindDropzonesByCityUseCaseTest {
+class FindDropzonesByCityServiceTest {
 
     @Mock
-    private DropzoneRepository dropzoneRepository;
+    private DropzoneRepositoryPort dropzoneRepositoryPort;
 
     @Mock
     private DropzoneMapper dropzoneMapper;
 
     @InjectMocks
-    private FindDropzonesByCityUseCase findDropzonesByCityUseCase;
+    private FindDropzonesByCityService findDropzonesByCityUseCase;
 
     @Test
     void execute_ShouldReturnDropzonesForCity() {
@@ -69,7 +69,7 @@ class FindDropzonesByCityUseCaseTest {
                 .isWingsuitFriendly(false)
                 .build();
 
-        when(dropzoneRepository.findByCity(city)).thenReturn(List.of(entity1, entity2));
+        when(dropzoneRepositoryPort.findByCity(city)).thenReturn(List.of(entity1, entity2));
         when(dropzoneMapper.toResponse(entity1)).thenReturn(response1);
         when(dropzoneMapper.toResponse(entity2)).thenReturn(response2);
 
@@ -79,20 +79,20 @@ class FindDropzonesByCityUseCaseTest {
         // Assert
         assertThat(result).hasSize(2);
         assertThat(result).containsExactly(response1, response2);
-        verify(dropzoneRepository).findByCity(city);
+        verify(dropzoneRepositoryPort).findByCity(city);
     }
 
     @Test
     void execute_ShouldReturnEmptyListWhenNoCityMatches() {
         // Arrange
         String city = "Nonexistent City";
-        when(dropzoneRepository.findByCity(city)).thenReturn(List.of());
+        when(dropzoneRepositoryPort.findByCity(city)).thenReturn(List.of());
 
         // Act
         List<DropzoneResponse> result = findDropzonesByCityUseCase.execute(city);
 
         // Assert
         assertThat(result).isEmpty();
-        verify(dropzoneRepository).findByCity(city);
+        verify(dropzoneRepositoryPort).findByCity(city);
     }
 }

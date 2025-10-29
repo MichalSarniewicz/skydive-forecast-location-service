@@ -1,7 +1,7 @@
-package com.skydiveforecast.domain.port.in;
+package com.skydiveforecast.application.service;
 
 import com.skydiveforecast.domain.exception.DropzoneNotFoundException;
-import com.skydiveforecast.infrastructure.adapter.out.persistance.DropzoneRepository;
+import com.skydiveforecast.domain.port.out.DropzoneRepositoryPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,38 +13,38 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class DeleteDropzoneUseCaseTest {
+class DeleteDropzoneServiceTest {
 
     @Mock
-    private DropzoneRepository dropzoneRepository;
+    private DropzoneRepositoryPort dropzoneRepositoryPort;
 
     @InjectMocks
-    private DeleteDropzoneUseCase deleteDropzoneUseCase;
+    private DeleteDropzoneService deleteDropzoneUseCase;
 
     @Test
     void execute_ShouldDeleteDropzoneWhenExists() {
         // Arrange
         Long dropzoneId = 1L;
-        when(dropzoneRepository.existsById(dropzoneId)).thenReturn(true);
+        when(dropzoneRepositoryPort.existsById(dropzoneId)).thenReturn(true);
 
         // Act
         deleteDropzoneUseCase.execute(dropzoneId);
 
         // Assert
-        verify(dropzoneRepository).existsById(dropzoneId);
-        verify(dropzoneRepository).deleteById(dropzoneId);
+        verify(dropzoneRepositoryPort).existsById(dropzoneId);
+        verify(dropzoneRepositoryPort).deleteById(dropzoneId);
     }
 
     @Test
     void execute_ShouldThrowExceptionWhenDropzoneNotFound() {
         // Arrange
         Long dropzoneId = 999L;
-        when(dropzoneRepository.existsById(dropzoneId)).thenReturn(false);
+        when(dropzoneRepositoryPort.existsById(dropzoneId)).thenReturn(false);
 
         // Act & Assert
         assertThatThrownBy(() -> deleteDropzoneUseCase.execute(dropzoneId))
                 .isInstanceOf(DropzoneNotFoundException.class)
                 .hasMessageContaining("Dropzone with id " + dropzoneId + " not found");
-        verify(dropzoneRepository).existsById(dropzoneId);
+        verify(dropzoneRepositoryPort).existsById(dropzoneId);
     }
 }

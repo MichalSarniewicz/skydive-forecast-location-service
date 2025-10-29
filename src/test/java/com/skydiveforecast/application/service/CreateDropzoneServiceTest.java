@@ -1,10 +1,10 @@
-package com.skydiveforecast.domain.port.in;
+package com.skydiveforecast.application.service;
 
 import com.skydiveforecast.domain.model.DropzoneEntity;
+import com.skydiveforecast.domain.port.out.DropzoneRepositoryPort;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneRequest;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
 import com.skydiveforecast.infrastructure.adapter.in.web.mapper.DropzoneMapper;
-import com.skydiveforecast.infrastructure.adapter.out.persistance.DropzoneRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,16 +19,16 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class CreateDropzoneUseCaseTest {
+class CreateDropzoneServiceTest {
 
     @Mock
-    private DropzoneRepository dropzoneRepository;
+    private DropzoneRepositoryPort dropzoneRepositoryPort;
 
     @Mock
     private DropzoneMapper dropzoneMapper;
 
     @InjectMocks
-    private CreateDropzoneUseCase createDropzoneUseCase;
+    private CreateDropzoneService createDropzoneService;
 
     @Test
     void execute_ShouldCreateAndReturnDropzone() {
@@ -68,11 +68,11 @@ class CreateDropzoneUseCaseTest {
                 .build();
 
         when(dropzoneMapper.toEntity(request)).thenReturn(entity);
-        when(dropzoneRepository.save(entity)).thenReturn(savedEntity);
+        when(dropzoneRepositoryPort.save(entity)).thenReturn(savedEntity);
         when(dropzoneMapper.toResponse(savedEntity)).thenReturn(expectedResponse);
 
         // Act
-        DropzoneResponse result = createDropzoneUseCase.execute(request);
+        DropzoneResponse result = createDropzoneService.execute(request);
 
         // Assert
         assertThat(result).isNotNull();
@@ -80,7 +80,7 @@ class CreateDropzoneUseCaseTest {
         assertThat(result.getName()).isEqualTo("Test Dropzone");
         assertThat(result.getCity()).isEqualTo("Test City");
         verify(dropzoneMapper).toEntity(request);
-        verify(dropzoneRepository).save(entity);
+        verify(dropzoneRepositoryPort).save(entity);
         verify(dropzoneMapper).toResponse(savedEntity);
     }
 
@@ -122,14 +122,14 @@ class CreateDropzoneUseCaseTest {
                 .build();
 
         when(dropzoneMapper.toEntity(request)).thenReturn(entity);
-        when(dropzoneRepository.save(any(DropzoneEntity.class))).thenReturn(savedEntity);
+        when(dropzoneRepositoryPort.save(any(DropzoneEntity.class))).thenReturn(savedEntity);
         when(dropzoneMapper.toResponse(savedEntity)).thenReturn(expectedResponse);
 
         // Act
-        DropzoneResponse result = createDropzoneUseCase.execute(request);
+        DropzoneResponse result = createDropzoneService.execute(request);
 
         // Assert
         assertThat(result.getIsWingsuitFriendly()).isFalse();
-        verify(dropzoneRepository).save(any(DropzoneEntity.class));
+        verify(dropzoneRepositoryPort).save(any(DropzoneEntity.class));
     }
 }
