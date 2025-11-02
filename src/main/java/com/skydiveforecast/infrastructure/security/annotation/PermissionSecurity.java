@@ -1,4 +1,4 @@
-package com.skydiveforecast.domain.annotation;
+package com.skydiveforecast.infrastructure.security.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

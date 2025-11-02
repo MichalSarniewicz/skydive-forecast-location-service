@@ -1,9 +1,8 @@
 package com.skydiveforecast.domain.port.in;
 
-import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneRequest;
-import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
+import com.skydiveforecast.domain.model.Dropzone;
 
 public interface CreateDropzoneUseCase {
 
-    DropzoneResponse execute(DropzoneRequest request);
+    Dropzone execute(Dropzone dropzone);
 }

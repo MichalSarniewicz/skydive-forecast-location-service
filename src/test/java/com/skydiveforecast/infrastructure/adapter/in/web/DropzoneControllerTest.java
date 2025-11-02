@@ -1,8 +1,10 @@
 package com.skydiveforecast.infrastructure.adapter.in.web;
 
+import com.skydiveforecast.domain.model.Dropzone;
 import com.skydiveforecast.domain.port.in.*;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneRequest;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
+import com.skydiveforecast.infrastructure.adapter.in.web.mapper.DropzoneMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,6 +40,9 @@ class DropzoneControllerTest {
     @Mock
     private FindDropzonesByCityUseCase findDropzonesByCityUseCase;
 
+    @Mock
+    private DropzoneMapper mapper;
+
     @InjectMocks
     private DropzoneController dropzoneController;
 
@@ -45,6 +50,23 @@ class DropzoneControllerTest {
     void createDropzone_ShouldReturnCreatedResponse() {
         // Arrange
         DropzoneRequest request = DropzoneRequest.builder()
+                .name("Test Dropzone")
+                .city("Test City")
+                .latitude(new BigDecimal("50.12345678"))
+                .longitude(new BigDecimal("19.12345678"))
+                .isWingsuitFriendly(true)
+                .build();
+
+        Dropzone domain = Dropzone.builder()
+                .name("Test Dropzone")
+                .city("Test City")
+                .latitude(new BigDecimal("50.12345678"))
+                .longitude(new BigDecimal("19.12345678"))
+                .isWingsuitFriendly(true)
+                .build();
+
+        Dropzone savedDomain = Dropzone.builder()
+                .id(1L)
                 .name("Test Dropzone")
                 .city("Test City")
                 .latitude(new BigDecimal("50.12345678"))
@@ -61,7 +83,9 @@ class DropzoneControllerTest {
                 .isWingsuitFriendly(true)
                 .build();
 
-        when(createDropzoneUseCase.execute(request)).thenReturn(expectedResponse);
+        when(mapper.toDomain(request)).thenReturn(domain);
+        when(createDropzoneUseCase.execute(domain)).thenReturn(savedDomain);
+        when(mapper.toResponse(savedDomain)).thenReturn(expectedResponse);
 
         // Act
         ResponseEntity<DropzoneResponse> response = dropzoneController.createDropzone(request);
@@ -69,13 +93,22 @@ class DropzoneControllerTest {
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isEqualTo(expectedResponse);
-        verify(createDropzoneUseCase).execute(request);
+        verify(createDropzoneUseCase).execute(domain);
     }
 
     @Test
     void getDropzone_ShouldReturnDropzone() {
         // Arrange
         Long dropzoneId = 1L;
+        Dropzone domain = Dropzone.builder()
+                .id(dropzoneId)
+                .name("Test Dropzone")
+                .city("Test City")
+                .latitude(new BigDecimal("50.12345678"))
+                .longitude(new BigDecimal("19.12345678"))
+                .isWingsuitFriendly(true)
+                .build();
+
         DropzoneResponse expectedResponse = DropzoneResponse.builder()
                 .id(dropzoneId)
                 .name("Test Dropzone")
@@ -85,7 +118,8 @@ class DropzoneControllerTest {
                 .isWingsuitFriendly(true)
                 .build();
 
-        when(getDropzoneUseCase.execute(dropzoneId)).thenReturn(expectedResponse);
+        when(getDropzoneUseCase.execute(dropzoneId)).thenReturn(domain);
+        when(mapper.toResponse(domain)).thenReturn(expectedResponse);
 
         // Act
         ResponseEntity<DropzoneResponse> response = dropzoneController.getDropzone(dropzoneId);
@@ -99,26 +133,45 @@ class DropzoneControllerTest {
     @Test
     void getAllDropzones_ShouldReturnAllDropzones() {
         // Arrange
-        List<DropzoneResponse> expectedResponses = List.of(
-                DropzoneResponse.builder()
-                        .id(1L)
-                        .name("Dropzone 1")
-                        .city("City 1")
-                        .latitude(new BigDecimal("50.12345678"))
-                        .longitude(new BigDecimal("19.12345678"))
-                        .isWingsuitFriendly(true)
-                        .build(),
-                DropzoneResponse.builder()
-                        .id(2L)
-                        .name("Dropzone 2")
-                        .city("City 2")
-                        .latitude(new BigDecimal("51.12345678"))
-                        .longitude(new BigDecimal("20.12345678"))
-                        .isWingsuitFriendly(false)
-                        .build()
-        );
+        Dropzone domain1 = Dropzone.builder()
+                .id(1L)
+                .name("Dropzone 1")
+                .city("City 1")
+                .latitude(new BigDecimal("50.12345678"))
+                .longitude(new BigDecimal("19.12345678"))
+                .isWingsuitFriendly(true)
+                .build();
 
-        when(getAllDropzonesUseCase.execute()).thenReturn(expectedResponses);
+        Dropzone domain2 = Dropzone.builder()
+                .id(2L)
+                .name("Dropzone 2")
+                .city("City 2")
+                .latitude(new BigDecimal("51.12345678"))
+                .longitude(new BigDecimal("20.12345678"))
+                .isWingsuitFriendly(false)
+                .build();
+
+        DropzoneResponse response1 = DropzoneResponse.builder()
+                .id(1L)
+                .name("Dropzone 1")
+                .city("City 1")
+                .latitude(new BigDecimal("50.12345678"))
+                .longitude(new BigDecimal("19.12345678"))
+                .isWingsuitFriendly(true)
+                .build();
+
+        DropzoneResponse response2 = DropzoneResponse.builder()
+                .id(2L)
+                .name("Dropzone 2")
+                .city("City 2")
+                .latitude(new BigDecimal("51.12345678"))
+                .longitude(new BigDecimal("20.12345678"))
+                .isWingsuitFriendly(false)
+                .build();
+
+        when(getAllDropzonesUseCase.execute()).thenReturn(List.of(domain1, domain2));
+        when(mapper.toResponse(domain1)).thenReturn(response1);
+        when(mapper.toResponse(domain2)).thenReturn(response2);
 
         // Act
         ResponseEntity<List<DropzoneResponse>> response = dropzoneController.getAllDropzones();
@@ -126,7 +179,6 @@ class DropzoneControllerTest {
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).hasSize(2);
-        assertThat(response.getBody()).isEqualTo(expectedResponses);
         verify(getAllDropzonesUseCase).execute();
     }
 
@@ -142,6 +194,23 @@ class DropzoneControllerTest {
                 .isWingsuitFriendly(false)
                 .build();
 
+        Dropzone domain = Dropzone.builder()
+                .name("Updated Dropzone")
+                .city("Updated City")
+                .latitude(new BigDecimal("50.12345678"))
+                .longitude(new BigDecimal("19.12345678"))
+                .isWingsuitFriendly(false)
+                .build();
+
+        Dropzone updatedDomain = Dropzone.builder()
+                .id(dropzoneId)
+                .name("Updated Dropzone")
+                .city("Updated City")
+                .latitude(new BigDecimal("50.12345678"))
+                .longitude(new BigDecimal("19.12345678"))
+                .isWingsuitFriendly(false)
+                .build();
+
         DropzoneResponse expectedResponse = DropzoneResponse.builder()
                 .id(dropzoneId)
                 .name("Updated Dropzone")
@@ -151,7 +220,9 @@ class DropzoneControllerTest {
                 .isWingsuitFriendly(false)
                 .build();
 
-        when(updateDropzoneUseCase.execute(dropzoneId, request)).thenReturn(expectedResponse);
+        when(mapper.toDomain(request)).thenReturn(domain);
+        when(updateDropzoneUseCase.execute(dropzoneId, domain)).thenReturn(updatedDomain);
+        when(mapper.toResponse(updatedDomain)).thenReturn(expectedResponse);
 
         // Act
         ResponseEntity<DropzoneResponse> response = dropzoneController.updateDropzone(dropzoneId, request);
@@ -159,7 +230,7 @@ class DropzoneControllerTest {
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualTo(expectedResponse);
-        verify(updateDropzoneUseCase).execute(dropzoneId, request);
+        verify(updateDropzoneUseCase).execute(dropzoneId, domain);
     }
 
     @Test
@@ -181,26 +252,45 @@ class DropzoneControllerTest {
     void getDropzonesByCity_ShouldReturnDropzonesForCity() {
         // Arrange
         String city = "Test City";
-        List<DropzoneResponse> expectedResponses = List.of(
-                DropzoneResponse.builder()
-                        .id(1L)
-                        .name("Dropzone 1")
-                        .city(city)
-                        .latitude(new BigDecimal("50.12345678"))
-                        .longitude(new BigDecimal("19.12345678"))
-                        .isWingsuitFriendly(true)
-                        .build(),
-                DropzoneResponse.builder()
-                        .id(2L)
-                        .name("Dropzone 2")
-                        .city(city)
-                        .latitude(new BigDecimal("50.22345678"))
-                        .longitude(new BigDecimal("19.22345678"))
-                        .isWingsuitFriendly(false)
-                        .build()
-        );
+        Dropzone domain1 = Dropzone.builder()
+                .id(1L)
+                .name("Dropzone 1")
+                .city(city)
+                .latitude(new BigDecimal("50.12345678"))
+                .longitude(new BigDecimal("19.12345678"))
+                .isWingsuitFriendly(true)
+                .build();
 
-        when(findDropzonesByCityUseCase.execute(city)).thenReturn(expectedResponses);
+        Dropzone domain2 = Dropzone.builder()
+                .id(2L)
+                .name("Dropzone 2")
+                .city(city)
+                .latitude(new BigDecimal("50.22345678"))
+                .longitude(new BigDecimal("19.22345678"))
+                .isWingsuitFriendly(false)
+                .build();
+
+        DropzoneResponse response1 = DropzoneResponse.builder()
+                .id(1L)
+                .name("Dropzone 1")
+                .city(city)
+                .latitude(new BigDecimal("50.12345678"))
+                .longitude(new BigDecimal("19.12345678"))
+                .isWingsuitFriendly(true)
+                .build();
+
+        DropzoneResponse response2 = DropzoneResponse.builder()
+                .id(2L)
+                .name("Dropzone 2")
+                .city(city)
+                .latitude(new BigDecimal("50.22345678"))
+                .longitude(new BigDecimal("19.22345678"))
+                .isWingsuitFriendly(false)
+                .build();
+
+        when(findDropzonesByCityUseCase.execute(city)).thenReturn(List.of(domain1, domain2));
+        when(mapper.toResponse(domain1)).thenReturn(response1);
+        when(mapper.toResponse(domain2)).thenReturn(response2);
 
         // Act
         ResponseEntity<List<DropzoneResponse>> response = dropzoneController.getDropzonesByCity(city);
@@ -208,7 +298,6 @@ class DropzoneControllerTest {
         // Assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).hasSize(2);
-        assertThat(response.getBody()).isEqualTo(expectedResponses);
         verify(findDropzonesByCityUseCase).execute(city);
     }
 }

@@ -285,32 +285,44 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DropzoneNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleDropzoneNotFound(DropzoneNotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handleDropzoneNotFound(
+            DropzoneNotFoundException ex, HttpServletRequest request) {
+
+        log.warn("Dropzone not found on {}: {}", request.getRequestURI(), ex.getMessage());
+
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND.value())
-                .error("Not Found")
+                .error("NOT_FOUND")
                 .message(ex.getMessage())
+                .path(request.getRequestURI())
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(
+            MethodArgumentNotValidException ex, HttpServletRequest request) {
+
+        log.warn("Validation failed on {}: {}", request.getRequestURI(), ex.getMessage());
+
+        Map<String, String> fieldErrors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
+            fieldErrors.put(fieldName, errorMessage);
         });
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("timestamp", LocalDateTime.now());
-        response.put("status", HttpStatus.BAD_REQUEST.value());
-        response.put("error", "Validation Failed");
-        response.put("errors", errors);
+        ValidationErrorResponse response = ValidationErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("VALIDATION_FAILED")
+                .message("Validation failed for one or more fields")
+                .path(request.getRequestURI())
+                .fieldErrors(fieldErrors)
+                .build();
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body((ErrorResponse) (Object) response);
     }
 
     // ============ GENERIC FALLBACK ============

@@ -14,6 +14,7 @@ public class DeleteDropzoneService implements DeleteDropzoneUseCase {
 
     private final DropzoneRepositoryPort dropzoneRepositoryPort;
 
+    @Override
     @Transactional
     @CacheEvict(value = "dropzones", allEntries = true)
     public void execute(Long id) {

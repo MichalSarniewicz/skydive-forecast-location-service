@@ -1,10 +1,10 @@
 package com.skydiveforecast.domain.port.in;
 
-import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
+import com.skydiveforecast.domain.model.Dropzone;
 
 import java.util.List;
 
 public interface FindDropzonesByCityUseCase {
 
-    List<DropzoneResponse> execute(String city);
+    List<Dropzone> execute(String city);
 }

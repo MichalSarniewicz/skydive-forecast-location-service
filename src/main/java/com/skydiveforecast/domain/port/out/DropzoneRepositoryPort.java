@@ -1,19 +1,19 @@
 package com.skydiveforecast.domain.port.out;
 
-import com.skydiveforecast.domain.model.DropzoneEntity;
+import com.skydiveforecast.domain.model.Dropzone;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface DropzoneRepositoryPort {
 
-    DropzoneEntity save(DropzoneEntity dropzone);
+    Dropzone save(Dropzone dropzone);
 
-    Optional<DropzoneEntity> findById(Long id);
+    Optional<Dropzone> findById(Long id);
 
-    List<DropzoneEntity> findAll();
+    List<Dropzone> findAll();
 
-    List<DropzoneEntity> findByCity(String city);
+    List<Dropzone> findByCity(String city);
 
     boolean existsById(Long id);
 

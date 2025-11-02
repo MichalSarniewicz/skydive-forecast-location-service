@@ -1,10 +1,7 @@
 package com.skydiveforecast.application.service;
 
-import com.skydiveforecast.domain.model.DropzoneEntity;
+import com.skydiveforecast.domain.model.Dropzone;
 import com.skydiveforecast.domain.port.out.DropzoneRepositoryPort;
-import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneRequest;
-import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
-import com.skydiveforecast.infrastructure.adapter.in.web.mapper.DropzoneMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,16 +21,13 @@ class CreateDropzoneServiceTest {
     @Mock
     private DropzoneRepositoryPort dropzoneRepositoryPort;
 
-    @Mock
-    private DropzoneMapper dropzoneMapper;
-
     @InjectMocks
     private CreateDropzoneService createDropzoneService;
 
     @Test
     void execute_ShouldCreateAndReturnDropzone() {
         // Arrange
-        DropzoneRequest request = DropzoneRequest.builder()
+        Dropzone dropzone = Dropzone.builder()
                 .name("Test Dropzone")
                 .city("Test City")
                 .latitude(new BigDecimal("50.12345678"))
@@ -41,15 +35,7 @@ class CreateDropzoneServiceTest {
                 .isWingsuitFriendly(true)
                 .build();
 
-        DropzoneEntity entity = DropzoneEntity.builder()
-                .name("Test Dropzone")
-                .city("Test City")
-                .latitude(new BigDecimal("50.12345678"))
-                .longitude(new BigDecimal("19.12345678"))
-                .isWingsuitFriendly(true)
-                .build();
-
-        DropzoneEntity savedEntity = DropzoneEntity.builder()
+        Dropzone savedDropzone = Dropzone.builder()
                 .id(1L)
                 .name("Test Dropzone")
                 .city("Test City")
@@ -58,36 +44,23 @@ class CreateDropzoneServiceTest {
                 .isWingsuitFriendly(true)
                 .build();
 
-        DropzoneResponse expectedResponse = DropzoneResponse.builder()
-                .id(1L)
-                .name("Test Dropzone")
-                .city("Test City")
-                .latitude(new BigDecimal("50.12345678"))
-                .longitude(new BigDecimal("19.12345678"))
-                .isWingsuitFriendly(true)
-                .build();
-
-        when(dropzoneMapper.toEntity(request)).thenReturn(entity);
-        when(dropzoneRepositoryPort.save(entity)).thenReturn(savedEntity);
-        when(dropzoneMapper.toResponse(savedEntity)).thenReturn(expectedResponse);
+        when(dropzoneRepositoryPort.save(dropzone)).thenReturn(savedDropzone);
 
         // Act
-        DropzoneResponse result = createDropzoneService.execute(request);
+        Dropzone result = createDropzoneService.execute(dropzone);
 
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getName()).isEqualTo("Test Dropzone");
         assertThat(result.getCity()).isEqualTo("Test City");
-        verify(dropzoneMapper).toEntity(request);
-        verify(dropzoneRepositoryPort).save(entity);
-        verify(dropzoneMapper).toResponse(savedEntity);
+        verify(dropzoneRepositoryPort).save(dropzone);
     }
 
     @Test
     void execute_ShouldHandleNonWingsuitFriendlyDropzone() {
         // Arrange
-        DropzoneRequest request = DropzoneRequest.builder()
+        Dropzone dropzone = Dropzone.builder()
                 .name("Non-Wingsuit Dropzone")
                 .city("City")
                 .latitude(new BigDecimal("51.00000000"))
@@ -95,15 +68,7 @@ class CreateDropzoneServiceTest {
                 .isWingsuitFriendly(false)
                 .build();
 
-        DropzoneEntity entity = DropzoneEntity.builder()
-                .name("Non-Wingsuit Dropzone")
-                .city("City")
-                .latitude(new BigDecimal("51.00000000"))
-                .longitude(new BigDecimal("20.00000000"))
-                .isWingsuitFriendly(false)
-                .build();
-
-        DropzoneEntity savedEntity = DropzoneEntity.builder()
+        Dropzone savedDropzone = Dropzone.builder()
                 .id(2L)
                 .name("Non-Wingsuit Dropzone")
                 .city("City")
@@ -112,24 +77,13 @@ class CreateDropzoneServiceTest {
                 .isWingsuitFriendly(false)
                 .build();
 
-        DropzoneResponse expectedResponse = DropzoneResponse.builder()
-                .id(2L)
-                .name("Non-Wingsuit Dropzone")
-                .city("City")
-                .latitude(new BigDecimal("51.00000000"))
-                .longitude(new BigDecimal("20.00000000"))
-                .isWingsuitFriendly(false)
-                .build();
-
-        when(dropzoneMapper.toEntity(request)).thenReturn(entity);
-        when(dropzoneRepositoryPort.save(any(DropzoneEntity.class))).thenReturn(savedEntity);
-        when(dropzoneMapper.toResponse(savedEntity)).thenReturn(expectedResponse);
+        when(dropzoneRepositoryPort.save(any(Dropzone.class))).thenReturn(savedDropzone);
 
         // Act
-        DropzoneResponse result = createDropzoneService.execute(request);
+        Dropzone result = createDropzoneService.execute(dropzone);
 
         // Assert
         assertThat(result.getIsWingsuitFriendly()).isFalse();
-        verify(dropzoneRepositoryPort).save(any(DropzoneEntity.class));
+        verify(dropzoneRepositoryPort).save(any(Dropzone.class));
     }
 }

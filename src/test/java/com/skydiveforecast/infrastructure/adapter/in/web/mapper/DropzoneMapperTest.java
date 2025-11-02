@@ -1,6 +1,6 @@
 package com.skydiveforecast.infrastructure.adapter.in.web.mapper;
 
-import com.skydiveforecast.domain.model.DropzoneEntity;
+import com.skydiveforecast.domain.model.Dropzone;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneRequest;
 import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ class DropzoneMapperTest {
     private final DropzoneMapper mapper = Mappers.getMapper(DropzoneMapper.class);
 
     @Test
-    void toEntity_ShouldMapRequestToEntity() {
+    void toDomain_ShouldMapRequestToDomain() {
         // Arrange
         DropzoneRequest request = DropzoneRequest.builder()
                 .name("Test Dropzone")
@@ -26,20 +26,20 @@ class DropzoneMapperTest {
                 .build();
 
         // Act
-        DropzoneEntity entity = mapper.toEntity(request);
+        Dropzone domain = mapper.toDomain(request);
 
         // Assert
-        assertThat(entity).isNotNull();
-        assertThat(entity.getId()).isNull();
-        assertThat(entity.getName()).isEqualTo("Test Dropzone");
-        assertThat(entity.getCity()).isEqualTo("Test City");
-        assertThat(entity.getLatitude()).isEqualTo(new BigDecimal("50.12345678"));
-        assertThat(entity.getLongitude()).isEqualTo(new BigDecimal("19.12345678"));
-        assertThat(entity.getIsWingsuitFriendly()).isTrue();
+        assertThat(domain).isNotNull();
+        assertThat(domain.getId()).isNull();
+        assertThat(domain.getName()).isEqualTo("Test Dropzone");
+        assertThat(domain.getCity()).isEqualTo("Test City");
+        assertThat(domain.getLatitude()).isEqualTo(new BigDecimal("50.12345678"));
+        assertThat(domain.getLongitude()).isEqualTo(new BigDecimal("19.12345678"));
+        assertThat(domain.getIsWingsuitFriendly()).isTrue();
     }
 
     @Test
-    void toEntity_ShouldHandleNonWingsuitFriendly() {
+    void toDomain_ShouldHandleNonWingsuitFriendly() {
         // Arrange
         DropzoneRequest request = DropzoneRequest.builder()
                 .name("Non-Wingsuit Dropzone")
@@ -50,16 +50,16 @@ class DropzoneMapperTest {
                 .build();
 
         // Act
-        DropzoneEntity entity = mapper.toEntity(request);
+        Dropzone domain = mapper.toDomain(request);
 
         // Assert
-        assertThat(entity.getIsWingsuitFriendly()).isFalse();
+        assertThat(domain.getIsWingsuitFriendly()).isFalse();
     }
 
     @Test
-    void toResponse_ShouldMapEntityToResponse() {
+    void toResponse_ShouldMapDomainToResponse() {
         // Arrange
-        DropzoneEntity entity = DropzoneEntity.builder()
+        Dropzone domain = Dropzone.builder()
                 .id(1L)
                 .name("Test Dropzone")
                 .city("Test City")
@@ -69,7 +69,7 @@ class DropzoneMapperTest {
                 .build();
 
         // Act
-        DropzoneResponse response = mapper.toResponse(entity);
+        DropzoneResponse response = mapper.toResponse(domain);
 
         // Assert
         assertThat(response).isNotNull();
@@ -84,7 +84,7 @@ class DropzoneMapperTest {
     @Test
     void toResponse_ShouldMapAllFields() {
         // Arrange
-        DropzoneEntity entity = DropzoneEntity.builder()
+        Dropzone domain = Dropzone.builder()
                 .id(99L)
                 .name("Another Dropzone")
                 .city("Another City")
@@ -94,7 +94,7 @@ class DropzoneMapperTest {
                 .build();
 
         // Act
-        DropzoneResponse response = mapper.toResponse(entity);
+        DropzoneResponse response = mapper.toResponse(domain);
 
         // Assert
         assertThat(response.getId()).isEqualTo(99L);

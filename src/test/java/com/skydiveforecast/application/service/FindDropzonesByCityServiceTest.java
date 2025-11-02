@@ -1,8 +1,6 @@
 package com.skydiveforecast.application.service;
 
-import com.skydiveforecast.domain.model.DropzoneEntity;
-import com.skydiveforecast.infrastructure.adapter.in.web.dto.DropzoneResponse;
-import com.skydiveforecast.infrastructure.adapter.in.web.mapper.DropzoneMapper;
+import com.skydiveforecast.domain.model.Dropzone;
 import com.skydiveforecast.domain.port.out.DropzoneRepositoryPort;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,9 +21,6 @@ class FindDropzonesByCityServiceTest {
     @Mock
     private DropzoneRepositoryPort dropzoneRepositoryPort;
 
-    @Mock
-    private DropzoneMapper dropzoneMapper;
-
     @InjectMocks
     private FindDropzonesByCityService findDropzonesByCityUseCase;
 
@@ -33,7 +28,7 @@ class FindDropzonesByCityServiceTest {
     void execute_ShouldReturnDropzonesForCity() {
         // Arrange
         String city = "Test City";
-        DropzoneEntity entity1 = DropzoneEntity.builder()
+        Dropzone dropzone1 = Dropzone.builder()
                 .id(1L)
                 .name("Dropzone 1")
                 .city(city)
@@ -42,7 +37,7 @@ class FindDropzonesByCityServiceTest {
                 .isWingsuitFriendly(true)
                 .build();
 
-        DropzoneEntity entity2 = DropzoneEntity.builder()
+        Dropzone dropzone2 = Dropzone.builder()
                 .id(2L)
                 .name("Dropzone 2")
                 .city(city)
@@ -51,34 +46,14 @@ class FindDropzonesByCityServiceTest {
                 .isWingsuitFriendly(false)
                 .build();
 
-        DropzoneResponse response1 = DropzoneResponse.builder()
-                .id(1L)
-                .name("Dropzone 1")
-                .city(city)
-                .latitude(new BigDecimal("50.12345678"))
-                .longitude(new BigDecimal("19.12345678"))
-                .isWingsuitFriendly(true)
-                .build();
-
-        DropzoneResponse response2 = DropzoneResponse.builder()
-                .id(2L)
-                .name("Dropzone 2")
-                .city(city)
-                .latitude(new BigDecimal("50.22345678"))
-                .longitude(new BigDecimal("19.22345678"))
-                .isWingsuitFriendly(false)
-                .build();
-
-        when(dropzoneRepositoryPort.findByCity(city)).thenReturn(List.of(entity1, entity2));
-        when(dropzoneMapper.toResponse(entity1)).thenReturn(response1);
-        when(dropzoneMapper.toResponse(entity2)).thenReturn(response2);
+        when(dropzoneRepositoryPort.findByCity(city)).thenReturn(List.of(dropzone1, dropzone2));
 
         // Act
-        List<DropzoneResponse> result = findDropzonesByCityUseCase.execute(city);
+        List<Dropzone> result = findDropzonesByCityUseCase.execute(city);
 
         // Assert
         assertThat(result).hasSize(2);
-        assertThat(result).containsExactly(response1, response2);
+        assertThat(result).containsExactly(dropzone1, dropzone2);
         verify(dropzoneRepositoryPort).findByCity(city);
     }
 
@@ -89,7 +64,7 @@ class FindDropzonesByCityServiceTest {
         when(dropzoneRepositoryPort.findByCity(city)).thenReturn(List.of());
 
         // Act
-        List<DropzoneResponse> result = findDropzonesByCityUseCase.execute(city);
+        List<Dropzone> result = findDropzonesByCityUseCase.execute(city);
 
         // Assert
         assertThat(result).isEmpty();

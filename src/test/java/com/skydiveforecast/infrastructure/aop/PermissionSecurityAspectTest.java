@@ -1,7 +1,7 @@
 package com.skydiveforecast.infrastructure.aop;
 
-import com.skydiveforecast.domain.annotation.PermissionSecurity;
 import com.skydiveforecast.infrastructure.security.PermissionSecurityService;
+import com.skydiveforecast.infrastructure.security.annotation.PermissionSecurity;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.jupiter.api.Test;
@@ -54,17 +54,19 @@ class PermissionSecurityAspectTest {
     }
 
     @Test
-    void checkPermission_ShouldThrowAccessDeniedWhenAnnotationNotFound() throws Throwable {
+    void checkPermission_ShouldThrowAccessDeniedWhenUserLacksPermission() throws Throwable {
         // Arrange
-        Method method = TestClass.class.getMethod("methodWithoutAnnotation");
+        String permission = "WRITE";
+        Method method = TestClass.class.getMethod("testMethodWrite");
         
         when(joinPoint.getSignature()).thenReturn(methodSignature);
         when(methodSignature.getMethod()).thenReturn(method);
+        when(permissionSecurityService.hasPermission(permission)).thenReturn(false);
 
         // Act & Assert
         assertThatThrownBy(() -> permissionSecurityAspect.checkPermission(joinPoint))
                 .isInstanceOf(AccessDeniedException.class)
-                .hasMessageContaining("PermissionSecurity annotation not found");
+                .hasMessageContaining("Access Denied");
         
         verify(joinPoint, never()).proceed();
     }
@@ -74,7 +76,8 @@ class PermissionSecurityAspectTest {
         public void testMethod() {
         }
 
-        public void methodWithoutAnnotation() {
+        @PermissionSecurity(permission = "WRITE")
+        public void testMethodWrite() {
         }
     }
 }

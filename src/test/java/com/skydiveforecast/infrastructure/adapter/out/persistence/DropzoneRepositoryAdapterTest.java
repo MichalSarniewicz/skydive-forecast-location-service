@@ -1,6 +1,8 @@
 package com.skydiveforecast.infrastructure.adapter.out.persistence;
 
+import com.skydiveforecast.domain.model.Dropzone;
 import com.skydiveforecast.domain.model.DropzoneEntity;
+import com.skydiveforecast.infrastructure.adapter.out.persistence.mapper.DropzoneEntityMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,11 +22,22 @@ class DropzoneRepositoryAdapterTest {
     @Mock
     private DropzoneJpaRepository jpaRepository;
 
+    @Mock
+    private DropzoneEntityMapper entityMapper;
+
     @InjectMocks
     private DropzoneRepositoryAdapter adapter;
 
     @Test
     void save_ShouldDelegateToJpaRepository() {
+        Dropzone domain = Dropzone.builder()
+                .name("Test")
+                .city("City")
+                .latitude(new BigDecimal("50.0"))
+                .longitude(new BigDecimal("20.0"))
+                .isWingsuitFriendly(true)
+                .build();
+
         DropzoneEntity entity = DropzoneEntity.builder()
                 .name("Test")
                 .city("City")
@@ -33,11 +46,13 @@ class DropzoneRepositoryAdapterTest {
                 .isWingsuitFriendly(true)
                 .build();
 
+        when(entityMapper.toEntity(domain)).thenReturn(entity);
         when(jpaRepository.save(entity)).thenReturn(entity);
+        when(entityMapper.toDomain(entity)).thenReturn(domain);
 
-        DropzoneEntity result = adapter.save(entity);
+        Dropzone result = adapter.save(domain);
 
-        assertThat(result).isEqualTo(entity);
+        assertThat(result).isEqualTo(domain);
         verify(jpaRepository).save(entity);
     }
 
@@ -45,34 +60,40 @@ class DropzoneRepositoryAdapterTest {
     void findById_ShouldDelegateToJpaRepository() {
         Long id = 1L;
         DropzoneEntity entity = DropzoneEntity.builder().id(id).build();
+        Dropzone domain = Dropzone.builder().id(id).build();
         when(jpaRepository.findById(id)).thenReturn(Optional.of(entity));
+        when(entityMapper.toDomain(entity)).thenReturn(domain);
 
-        Optional<DropzoneEntity> result = adapter.findById(id);
+        Optional<Dropzone> result = adapter.findById(id);
 
-        assertThat(result).isPresent().contains(entity);
+        assertThat(result).isPresent().contains(domain);
         verify(jpaRepository).findById(id);
     }
 
     @Test
     void findAll_ShouldDelegateToJpaRepository() {
-        List<DropzoneEntity> entities = List.of(DropzoneEntity.builder().build());
-        when(jpaRepository.findAll()).thenReturn(entities);
+        DropzoneEntity entity = DropzoneEntity.builder().build();
+        Dropzone domain = Dropzone.builder().build();
+        when(jpaRepository.findAll()).thenReturn(List.of(entity));
+        when(entityMapper.toDomain(entity)).thenReturn(domain);
 
-        List<DropzoneEntity> result = adapter.findAll();
+        List<Dropzone> result = adapter.findAll();
 
-        assertThat(result).isEqualTo(entities);
+        assertThat(result).containsExactly(domain);
         verify(jpaRepository).findAll();
     }
 
     @Test
     void findByCity_ShouldDelegateToJpaRepository() {
         String city = "TestCity";
-        List<DropzoneEntity> entities = List.of(DropzoneEntity.builder().city(city).build());
-        when(jpaRepository.findByCity(city)).thenReturn(entities);
+        DropzoneEntity entity = DropzoneEntity.builder().city(city).build();
+        Dropzone domain = Dropzone.builder().city(city).build();
+        when(jpaRepository.findByCity(city)).thenReturn(List.of(entity));
+        when(entityMapper.toDomain(entity)).thenReturn(domain);
 
-        List<DropzoneEntity> result = adapter.findByCity(city);
+        List<Dropzone> result = adapter.findByCity(city);
 
-        assertThat(result).isEqualTo(entities);
+        assertThat(result).containsExactly(domain);
         verify(jpaRepository).findByCity(city);
     }
 
