@@ -95,14 +95,14 @@ The application supports multiple profiles for different environments:
 
 ### Dropzone Management
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/api/locations/dropzones` | Create a new dropzone | Yes |
-| GET | `/api/locations/dropzones/{id}` | Get dropzone by ID | Yes |
-| GET | `/api/locations/dropzones` | Get all dropzones | Yes |
-| PUT | `/api/locations/dropzones/{id}` | Update dropzone | Yes |
-| DELETE | `/api/locations/dropzones/{id}` | Delete dropzone | Yes |
-| GET | `/api/locations/dropzones/city/{city}` | Find dropzones by city | Yes |
+| Method | Endpoint                               | Description | Auth Required |
+|--------|----------------------------------------|-------------|---------------|
+| POST | `/api/v1/locations/dropzones`          | Create a new dropzone | Yes |
+| GET | `/api/v1/locations/dropzones/{id}`        | Get dropzone by ID | Yes |
+| GET | `/api/v1/locations/dropzones`             | Get all dropzones | Yes |
+| PUT | `/api/v1/locations/dropzones/{id}`        | Update dropzone | Yes |
+| DELETE | `/api/v1/locations/dropzones/{id}`        | Delete dropzone | Yes |
+| GET | `/api/v1/locations/dropzones/city/{city}` | Find dropzones by city | Yes |
 
 ### API Documentation
 

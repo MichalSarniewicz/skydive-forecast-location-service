@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/locations/dropzones")
+@RequestMapping("/api/v1/locations/dropzones")
 @RequiredArgsConstructor
 public class DropzoneController {
 
