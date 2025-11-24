@@ -16,40 +16,62 @@ This service is responsible for managing skydiving dropzone locations, including
 
 ## Architecture
 
-The service follows **Hexagonal Architecture** (Ports and Adapters) pattern:
+The service follows **Hexagonal Architecture** (Ports and Adapters) pattern with strict layer separation:
 
-- **Domain Layer**: Core business logic and entities
-  - `DropzoneEntity`: Domain model for dropzone locations
-  - `DropzoneNotFoundException`: Custom exception for missing dropzones
-  - **Ports**: Use case interfaces defining business operations
+### Domain Layer (Core Business Logic)
+- **Models**:
+  - `Dropzone`: Pure domain model (immutable, no framework dependencies)
+  - `DropzoneEntity`: JPA entity for persistence (infrastructure concern)
+- **Exceptions**: `DropzoneNotFoundException`
+- **Ports**:
+  - **Input Ports** (Use Cases):
     - `CreateDropzoneUseCase`
     - `GetDropzoneUseCase`
     - `GetAllDropzonesUseCase`
     - `UpdateDropzoneUseCase`
     - `DeleteDropzoneUseCase`
     - `FindDropzonesByCityUseCase`
+  - **Output Ports**:
+    - `DropzoneRepositoryPort`: Repository abstraction
 
-- **Infrastructure Layer**: Technical implementations
-  - **Adapters**: REST controllers, DTOs, and mappers
-  - **Security**: JWT authentication and permission-based authorization
-  - **Configuration**: Exception handling, OpenAPI documentation
-  - **AOP**: Permission security aspect
+### Application Layer (Use Case Implementations)
+- Service implementations that orchestrate domain logic
+- Transaction management
+- Cache management
+
+### Infrastructure Layer (Technical Implementations)
+- **Inbound Adapters**:
+  - REST controllers (`DropzoneController`)
+  - DTOs (`DropzoneRequest`, `DropzoneResponse`)
+  - DTO mappers (MapStruct)
+- **Outbound Adapters**:
+  - `DropzoneRepositoryAdapter`: Implements `DropzoneRepositoryPort`
+  - `DropzoneJpaRepository`: Spring Data JPA repository
+  - Entity mappers (MapStruct)
+- **Security**:
+  - JWT authentication filter
+  - Permission-based authorization with AOP
+  - `@PermissionSecurity` annotation
+- **Configuration**: Exception handling, OpenAPI, caching
 
 ## Technology Stack
 
 - **Java**: 21
 - **Spring Boot**: 3.5.6
+- **Spring Cloud Config Client**: Centralized configuration
+- **Spring Cloud Consul Discovery**: Service discovery and registration
 - **Spring Security**: JWT-based authentication
 - **Spring Data JPA**: Database access with Hibernate
 - **PostgreSQL**: Primary database
 - **Redis**: Caching layer
+- **Apache Kafka**: Event streaming
 - **Liquibase**: Database migration management
 - **MapStruct**: DTO mapping
 - **SpringDoc OpenAPI**: API documentation (Swagger)
 - **Lombok**: Boilerplate code reduction
 - **JUnit 5 & Mockito**: Unit testing
 - **Testcontainers**: Integration testing
-- **Monitoring**: Actuator, Prometheus, Grafana, Loki, Zipkin
+- **Monitoring**: Actuator, Prometheus, Grafana, Loki, Tempo
 - **Build Tool**: Maven
 
 ## Getting Started
@@ -69,7 +91,12 @@ git clone <repository-url>
 cd skydive-forecast-location-service
 ```
 
-2. Configure the database and Redis in `application.yaml` or use environment-specific profiles
+2. Ensure required services are running:
+   - **Consul** (Port 8500) - Service discovery
+   - **Config Server** (Port 8888) - Configuration
+   - **PostgreSQL** (Port 5432) - Database
+   - **Redis** (Port 6379) - Cache
+   - **Kafka** (Port 9092) - Messaging
 
 3. Build the project:
 ```bash
@@ -81,7 +108,10 @@ cd skydive-forecast-location-service
 ./mvnw spring-boot:run
 ```
 
-The service will start on port **8083** by default.
+The service will:
+- Start on port **8083**
+- Register itself in Consul
+- Load configuration from Config Server
 
 ## Configuration
 
@@ -95,14 +125,14 @@ The application supports multiple profiles for different environments:
 
 ### Dropzone Management
 
-| Method | Endpoint                               | Description | Auth Required |
-|--------|----------------------------------------|-------------|---------------|
-| POST | `/api/v1/locations/dropzones`          | Create a new dropzone | Yes |
-| GET | `/api/v1/locations/dropzones/{id}`        | Get dropzone by ID | Yes |
-| GET | `/api/v1/locations/dropzones`             | Get all dropzones | Yes |
-| PUT | `/api/v1/locations/dropzones/{id}`        | Update dropzone | Yes |
-| DELETE | `/api/v1/locations/dropzones/{id}`        | Delete dropzone | Yes |
-| GET | `/api/v1/locations/dropzones/city/{city}` | Find dropzones by city | Yes |
+| Method | Endpoint                               | Description | Permission Required |
+|--------|----------------------------------------|-------------|---------------------|
+| POST | `/api/locations/dropzones`          | Create a new dropzone | DROPZONE_CREATE |
+| GET | `/api/locations/dropzones/{id}`        | Get dropzone by ID | DROPZONE_VIEW |
+| GET | `/api/locations/dropzones`             | Get all dropzones | DROPZONE_VIEW |
+| PUT | `/api/locations/dropzones/{id}`        | Update dropzone | DROPZONE_UPDATE |
+| DELETE | `/api/locations/dropzones/{id}`        | Delete dropzone | DROPZONE_DELETE |
+| GET | `/api/locations/dropzones/city/{city}` | Find dropzones by city | DROPZONE_VIEW |
 
 ### API Documentation
 
@@ -120,9 +150,17 @@ Authorization: Bearer <your-jwt-token>
 ### Permission-Based Authorization
 
 The service implements fine-grained permission control using AOP:
-- `@PermissionSecurity` annotation on methods
+- `@PermissionSecurity` annotation on controller methods
+- `PermissionSecurityAspect` intercepts annotated methods
 - Permission validation through JWT token claims
+- Permissions extracted from `CustomUserPrincipal`
 - Access denied exceptions for unauthorized requests
+
+**Required Permissions:**
+- `DROPZONE_CREATE`: Create new dropzones
+- `DROPZONE_VIEW`: View dropzone information
+- `DROPZONE_UPDATE`: Update existing dropzones
+- `DROPZONE_DELETE`: Delete dropzones
 
 ## Database Schema
 
@@ -176,24 +214,49 @@ java -jar target/skydive-forecast-location-service-1.0.0-SNAPSHOT.jar
 
 The project includes comprehensive unit tests following the AAA (Arrange-Act-Assert) pattern:
 
-- **Controller Tests**: REST endpoint testing with MockMvc
-- **Service Tests**: Business logic validation
+- **Controller Tests**: REST endpoint testing with mocked use cases and mappers
+- **Service Tests**: Business logic validation with domain models
+- **Repository Adapter Tests**: Persistence layer with entity mapping
+- **Mapper Tests**: MapStruct DTO and entity mapping validation
 - **Security Tests**: Authentication and authorization testing
-- **DTO Tests**: Validation and mapping tests
+- **AOP Tests**: Permission security aspect validation
 - **Exception Handler Tests**: Error handling verification
+
+**Test Coverage**: All layers tested in isolation with proper mocking
 
 Run tests with coverage:
 ```bash
 ./mvnw clean test jacoco:report
 ```
 
+## Key Design Decisions
+
+### Separation of Domain and Persistence
+- **Domain Model** (`Dropzone`): Pure business object, immutable, framework-agnostic
+- **JPA Entity** (`DropzoneEntity`): Persistence model with JPA annotations
+- **Mapping**: MapStruct handles conversion between domain and entity
+
+### Dependency Direction
+- Domain layer has **zero dependencies** on infrastructure
+- Use cases work with domain models only
+- Controllers and repositories adapt between DTOs/entities and domain models
+- Follows **Dependency Inversion Principle**
+
+### Benefits
+- **Testability**: Domain logic tested without database or framework
+- **Flexibility**: Easy to change persistence or API without affecting business logic
+- **Maintainability**: Clear separation of concerns
+- **SOLID Principles**: Strict adherence to clean architecture principles
+
 ## Integration with Skydive Forecast Ecosystem
 
 This service is part of the Skydive Forecast microservices architecture:
 
-- **Gateway**: Routes requests from `http://localhost:8080/api/locations/**` to this service
+- **Gateway**: Discovers this service via Consul and routes requests from `http://localhost:8080/api/locations/**`
 - **Users Service** (Port 8081): Provides authentication and user management
 - **Analyses Service** (Port 8082): Consumes location data for forecast analysis
+- **Consul**: Service registry at `http://localhost:8500`
+- **Config Server**: Configuration management at `http://localhost:8888`
 
 ## Error Handling
 
@@ -223,9 +286,9 @@ The service includes comprehensive monitoring capabilities:
 
 Application logs are automatically sent to Loki for centralized log aggregation.
 
-### Distributed Tracing (Zipkin)
+### Distributed Tracing (Tempo)
 
-- **Endpoint**: `http://localhost:9411`
+- **Endpoint**: `http://localhost:4318`
 - **Traces**: Request flows across services with timing information
 - **Sampling**: 100% of requests traced (configurable)
 
