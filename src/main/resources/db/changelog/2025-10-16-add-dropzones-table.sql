@@ -1,10 +1,10 @@
 --liquibase formatted sql
---changeset 2025-10-16-add-dropzones-table splitStatements:false
+--changeset author:2025-10-16-add-dropzones-table
 
 -- Create a schema if not exists
 CREATE SCHEMA IF NOT EXISTS skydive_forecast_location;
 
-CREATE TABLE skydive_forecast_location.dropzones
+CREATE TABLE IF NOT EXISTS skydive_forecast_location.dropzones
 (
     id                   BIGSERIAL PRIMARY KEY,
     name                 VARCHAR(255) UNIQUE NOT NULL,
@@ -14,5 +14,5 @@ CREATE TABLE skydive_forecast_location.dropzones
     is_wingsuit_friendly BOOLEAN             NOT NULL DEFAULT false
 );
 
-CREATE INDEX idx_dropzone_city ON skydive_forecast_location.dropzones (city);
-CREATE INDEX idx_dropzone_coordinates ON skydive_forecast_location.dropzones (latitude, longitude);
+CREATE INDEX IF NOT EXISTS idx_dropzone_city ON skydive_forecast_location.dropzones (city);
+CREATE INDEX IF NOT EXISTS idx_dropzone_coordinates ON skydive_forecast_location.dropzones (latitude, longitude);

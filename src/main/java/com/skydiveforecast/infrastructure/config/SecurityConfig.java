@@ -26,7 +26,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -67,9 +66,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/auth/**",
                                 "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs",
                                 "/v3/api-docs.yaml",
                                 "/v3/api-docs/**",
-                                "/actuator/**").permitAll()
+                                "/actuator/**")
+                        .permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

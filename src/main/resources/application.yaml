@@ -12,8 +12,8 @@ spring:
         format_sql: true
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.xml
-    database-change-log-table: skydive-forecast-location.DATABASECHANGELOG
-    database-change-log-lock-table: skydive-forecast-location.DATABASECHANGELOGLOCK
+    database-change-log-table: skydive_forecast_location.DATABASECHANGELOG
+    database-change-log-lock-table: skydive_forecast_location.DATABASECHANGELOGLOCK
   data:
     redis:
       host: localhost
@@ -48,10 +48,11 @@ management:
 
 springdoc:
   api-docs:
-    path: /v3/api-docs/locations
+    path: /v3/api-docs
+    enabled: true
   swagger-ui:
     path: /swagger-ui.html
-    url: /v3/api-docs/locations.yaml
+    enabled: true
 
 jwt:
   secret: change-me-please-and-make-it-at-least-32-characters-long
