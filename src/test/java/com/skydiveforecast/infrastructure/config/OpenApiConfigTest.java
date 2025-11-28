@@ -18,9 +18,9 @@ class OpenApiConfigTest {
         // Assert
         assertThat(openAPI).isNotNull();
         assertThat(openAPI.getInfo()).isNotNull();
-        assertThat(openAPI.getInfo().getTitle()).isEqualTo("API");
+        assertThat(openAPI.getInfo().getTitle()).isEqualTo("Location Service API");
         assertThat(openAPI.getInfo().getVersion()).isEqualTo("1.0");
-        assertThat(openAPI.getInfo().getDescription()).isEqualTo("API documentation");
+        assertThat(openAPI.getInfo().getDescription()).isEqualTo("API documentation for Location Service");
     }
 
     @Test
