@@ -1,5 +1,5 @@
 --liquibase formatted sql
---changeset 2025-10-24-insert-dropzones splitStatements:false
+--changeset author:2025-10-24-insert-dropzones context:seed
 
 INSERT INTO skydive_forecast_location.dropzones
 (name, city, latitude, longitude, is_wingsuit_friendly)
