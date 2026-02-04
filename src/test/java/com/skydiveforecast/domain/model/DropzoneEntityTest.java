@@ -1,5 +1,6 @@
 package com.skydiveforecast.domain.model;
 
+import com.skydiveforecast.infrastructure.persistance.entity.DropzoneEntity;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

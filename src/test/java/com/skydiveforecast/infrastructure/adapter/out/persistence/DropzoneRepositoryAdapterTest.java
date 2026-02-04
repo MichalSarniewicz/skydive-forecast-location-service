@@ -1,7 +1,7 @@
 package com.skydiveforecast.infrastructure.adapter.out.persistence;
 
 import com.skydiveforecast.domain.model.Dropzone;
-import com.skydiveforecast.domain.model.DropzoneEntity;
+import com.skydiveforecast.infrastructure.persistance.entity.DropzoneEntity;
 import com.skydiveforecast.infrastructure.adapter.out.persistence.mapper.DropzoneEntityMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
